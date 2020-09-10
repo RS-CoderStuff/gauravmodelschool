@@ -33,23 +33,25 @@ client = razorpay.Client(auth=("rzp_live_2hQX2O1sphWJK4", "ybUOaopHhynTWymSvvjwF
 
 from fpdf import FPDF
 
+
+
+
 import pycountry
 
 
 def aaa(request):
     return render(request, 'account-verify1.html', locals())
 
-
 def payment_successful(request):
     return render(request, 'payment-successful.html', locals())
-
 
 def cancel_payment(request):
     return render(request, 'cancel-payment.html', locals())
 
 
+
 def student_login(request):
-    redirect_to = request.GET.get('next', '')
+    redirect_to = request.GET.get('next','')
     if request.method == 'POST':
         form = UserLoginForm(request.POST)
         if form.is_valid():
@@ -78,17 +80,19 @@ def student_login(request):
     return render(request, 'student-login.html', locals())
 
 
-class Student_Sign_Up(SuccessMessageMixin, CreateView):
+
+
+
+class Student_Sign_Up(SuccessMessageMixin,CreateView):
     model = User
     form_class = SignUpForm
     template_name = 'student-signup.html'
-
     def post(self, request, *args, **kwargs):
         redirect_to = request.GET.get('next', '')
         print(redirect_to)
         print('------------------------------')
 
-        form = self.form_class(request.POST)
+        form =self.form_class(request.POST)
         countryCode = request.POST['countryCode']
         print(countryCode)
         if form.is_valid():
@@ -99,7 +103,7 @@ class Student_Sign_Up(SuccessMessageMixin, CreateView):
             login(request, user)
             phone = form.cleaned_data.get('phone')
             city = form.cleaned_data.get('city')
-            get_ct = '+' + countryCode + phone
+            get_ct = '+'+countryCode+phone
             pn = phonenumbers.parse(get_ct)
             country = pycountry.countries.get(alpha_2=region_code_for_number(pn))
             main_course_category_id = form.cleaned_data.get('main_course_category_id')
@@ -115,7 +119,7 @@ class Student_Sign_Up(SuccessMessageMixin, CreateView):
             username = form.cleaned_data.get('username')
             current_site = get_current_site(request)
             use_https = False
-            d = ({'email': to_email, 'username': username, 'WEB_SITE_URL': WEB_SITE_URL})
+            d = ({'email': to_email,'username':username, 'WEB_SITE_URL': WEB_SITE_URL})
             plaintext = get_template('email-template/email.txt')
             htmly = get_template('email-template/welcome.html')
             subject, from_email, to = "Welcome To Tajinder's English Classes", settings.DEFAULT_FROM_EMAIL, to_email
@@ -123,17 +127,19 @@ class Student_Sign_Up(SuccessMessageMixin, CreateView):
             html_content = htmly.render(d)
             # msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
             # msg.attach_alternative(html_content, "text/html")
-            # msg.send()
+            #msg.send()
             if redirect_to != '':
                 return redirect(redirect_to)
             else:
                 return redirect(reverse('index'))
 
-        return render(request, self.template_name, locals())
 
-    def get(self, request, *args, **kwargs):
-        form = self.form_class
         return render(request, self.template_name, locals())
+    def get(self, request, *args, **kwargs):
+        form  = self.form_class
+        return render(request,self.template_name,locals())
+
+
 
 
 def view_awards(request):
@@ -141,12 +147,15 @@ def view_awards(request):
 
 
 def all_awards(request):
-    gallery_list = Gallery_Db.objects.all().order_by('-id')
+    gallery_list=Gallery_Db.objects.all().order_by('-id')
     return render(request, 'all-awards.html', locals())
+
+
 
 
 def invalid(request):
     return render(request, 'invalid-activation.html', locals())
+
 
 
 class LogoutIfNotStaffMixin(AccessMixin):
@@ -159,6 +168,8 @@ class LogoutIfNotStaffMixin(AccessMixin):
         return super(LogoutIfNotStaffMixin, self).dispatch(request, *args, **kwargs)
 
 
+
+
 def handler(request, *args, **argv):
     return render(request, "404.html", locals())
 
@@ -166,18 +177,16 @@ def handler(request, *args, **argv):
 def handler50(request):
     return render(request, "404.html", locals())
 
-
 def index(request):
     gallery_list = Gallery_Db.objects.all().order_by('-id')[:9]
     faq_list = Faq_Db.objects.all().order_by('-id')[:6]
     blog_list = Blog_Db.objects.all().order_by('-id')[:3]
     testimonial_list = Testimonial_Db.objects.all().order_by('-id')[:6]
     course_list = Course_Db.objects.all().order_by('-id')[:6]
-    return render(request, 'index.html', locals())
-
+    return render(request , 'index.html',locals())
 
 def policy(request):
-    return render(request, 'policy.html', locals())
+    return render(request , 'policy.html',locals())
 
 
 def blog(request):
@@ -191,16 +200,17 @@ def blog(request):
         users = paginator.page(1)
     except EmptyPage:
         users = paginator.page(paginator.num_pages)
-    return render(request, 'blogs.html', locals())
+    return render(request,'blogs.html',locals())
 
 
 def blog_details(request, slug):
-    recent_blog_list = Blog_Db.objects.all().order_by('-id')[:8]
-    blog_list = Blog_Db.objects.filter(slug=slug)
-    return render(request, 'blog-details.html', locals())
+    recent_blog_list=Blog_Db.objects.all().order_by('-id')[:8]
+    blog_list=Blog_Db.objects.filter(slug=slug)
+    return render(request , 'blog-details.html',locals())
 
 
-def buy_course(request, pk):
+
+def buy_course(request,pk):
     if request.user.is_authenticated:
         if request.user.is_superuser:
             course_data = Course_Db.objects.get(id=pk)
@@ -212,14 +222,13 @@ def buy_course(request, pk):
     else:
         course_data = Course_Db.objects.get(id=pk)
         course_list = Course_Db.objects.filter(id=pk)
-    DATA = {'amount': int(course_data.price) * 100, 'currency': 'INR', 'receipt': course_data.name.title,
-            'payment_capture': 1}
+    DATA = {'amount': int(course_data.price) * 100, 'currency': 'INR', 'receipt': course_data.name.title, 'payment_capture': 1}
     amount = int(course_data.price) * 100
     order_data = client.order.create(data=DATA)
-    return render(request, 'buy-course.html', locals())
+    return render(request , 'buy-course.html',locals())
 
 
-def paymentstatus(request, pair):
+def paymentstatus(request,pair):
     payment_id = pair
     resp = client.payment.fetch(payment_id)
     print(resp)
@@ -227,7 +236,7 @@ def paymentstatus(request, pair):
     rp_order_id = resp['order_id']
     description = resp['description']
     email = resp['email']
-    print(email, description)
+    print(email,description)
     d = ({'email': email, 'username': request.user.username, 'WEB_SITE_URL': WEB_SITE_URL})
     plaintext = get_template('email-template/email.txt')
     htmly = get_template('email-template/payment-succuss-email.html')
@@ -236,24 +245,27 @@ def paymentstatus(request, pair):
     html_content = htmly.render(d)
     # msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
     # msg.attach_alternative(html_content, "text/html")
-    # msg.send()
+    #msg.send()
+
 
     # print(rp_id,rp_order_id )
     return render(request, 'payment-successful.html', locals())
 
 
+
+
 @login_required(login_url="sign_in")
 def tec_courses(request):
     if request.user.user_type == 2:
-        main_course_category_list = Main_Course_Category_Db.objects.all().order_by('-id')
-        _list = User_Profile.objects.filter(user_id=request.user.id)
+        main_course_category_list =Main_Course_Category_Db.objects.all().order_by('-id')
+        _list =User_Profile.objects.filter(user_id=request.user.id)
         for xxx in _list:
             list = Sub_Course_Category_Db.objects.filter(main_course_category_id=xxx.main_course_category_id.id)
             co_list = Course_Content_Db.objects.filter(main_course_category_id=xxx.main_course_category_id.id)
     else:
-        messages.success(request,
-                         "You don't have permission to access the content on website. \n Go to the Mobile Application for demo \n or \n Contact Administrator to access the content.!")
-    return render(request, 'tec-courses.html', locals())
+        messages.success(request, "You don't have permission to access the content on website. \n Go to the Mobile Application for demo \n or \n Contact Administrator to access the content.!")
+    return render(request , 'tec-courses.html',locals())
+
 
 
 def load_sub_course_category_front(request):
@@ -261,15 +273,16 @@ def load_sub_course_category_front(request):
     # print(super_course_category_id)
     list = Sub_Course_Category_Db.objects.filter(super_course_category_id=super_course_category_id)
     co_list = Course_Content_Db.objects.filter(super_course_category_id=super_course_category_id)
-    return render(request, 'load_sub_course_category_front.html', locals())
+    return render(request, 'load_sub_course_category_front.html',locals())
+
 
 
 @login_required(login_url="sign_in")
-def course_details(request, pk, sub_id):
+def course_details(request,pk ,sub_id):
     if request.user.user_type == 2:
         pk = int(pk)
-        list = Course_Content_Db.objects.filter(sub_course_category_id=sub_id, trash=1)
-        main_list = Course_Content_Db.objects.filter(pk=pk, trash=1)
+        list = Course_Content_Db.objects.filter(sub_course_category_id=sub_id,trash=1)
+        main_list = Course_Content_Db.objects.filter(pk=pk,trash=1)
         for i in list:
             coure_name = i.main_course_category_id.title
         user_list = Images_data.objects.filter(course_id=pk)
@@ -282,27 +295,24 @@ def course_details(request, pk, sub_id):
         except EmptyPage:
             users = paginator.page(paginator.num_pages)
     else:
-        messages.success(request,
-                         "You don't have permission to access the content on website. \n Go to the Mobile Application for demo \n or \n Contact Administrator to access the content.!")
-    return render(request, 'course-details.html', locals())
+        messages.success(request,"You don't have permission to access the content on website. \n Go to the Mobile Application for demo \n or \n Contact Administrator to access the content.!")
+    return render(request , 'course-details.html',locals())
 
 
 def verify_email(request):
-    return render(request, 'verify-email.html')
+    return render(request , 'verify-email.html')
 
 
 def tec_pdf(request):
-    return render(request, 'tec-pdf.html')
-
+    return render(request , 'tec-pdf.html')
 
 def crash_courses(request):
     course_list = Course_Db.objects.all().order_by('-id')[:6]
-    return render(request, 'crash-courses.html', locals())
+    return render(request , 'crash-courses.html',locals())
 
 
 def enroll_now(request):
-    return render(request, 'enroll-now.html')
-
+    return render(request , 'enroll-now.html')
 
 def change_password(request):
     if request.user.is_superuser == 1:
@@ -317,8 +327,7 @@ def change_password(request):
                 messages.error(request, 'Please correct the error below.')
         else:
             form = PasswordChangeForm(request.user)
-        return render(request, 'admin/change-password.html', locals())
-
+        return render(request , 'admin/change-password.html',locals())
 
 def sign_in(request):
     if request.method == 'POST':
@@ -328,7 +337,7 @@ def sign_in(request):
             password = request.POST['password']
             try:
                 username = User.objects.get(email=email.lower()).username
-                user = authenticate(request, username=username, password=password)
+                user = authenticate(request,username=username, password=password)
             except:
                 user = None
                 messages.error(request, "Your Email Address or Password was not recognized")
@@ -346,23 +355,23 @@ def sign_in(request):
 
     else:
         form = UserLoginForm()
-    return render(request, 'sign-in.html', locals())
+    return render(request , 'sign-in.html',locals())
 
 
-class Sign_Up(SuccessMessageMixin, CreateView):
+
+class Sign_Up(SuccessMessageMixin,CreateView):
     model = User
     form_class = SignUpForm
     template_name = 'sign-up.html'
-
     def post(self, request, *args, **kwargs):
-        form = self.form_class(request.POST)
+        form =self.form_class(request.POST)
         countryCode = request.POST['countryCode']
         print(countryCode)
         if form.is_valid():
             form_1 = form.save()
             phone = form.cleaned_data.get('phone')
             city = form.cleaned_data.get('city')
-            get_ct = '+' + countryCode + phone
+            get_ct = '+'+countryCode+phone
             pn = phonenumbers.parse(get_ct)
             country = pycountry.countries.get(alpha_2=region_code_for_number(pn))
             main_course_category_id = form.cleaned_data.get('main_course_category_id')
@@ -378,7 +387,7 @@ class Sign_Up(SuccessMessageMixin, CreateView):
             username = form.cleaned_data.get('username')
             current_site = get_current_site(request)
             use_https = False
-            d = ({'email': to_email, 'username': username, 'WEB_SITE_URL': WEB_SITE_URL})
+            d = ({'email': to_email,'username':username, 'WEB_SITE_URL': WEB_SITE_URL})
             plaintext = get_template('email-template/email.txt')
             htmly = get_template('email-template/welcome.html')
             subject, from_email, to = "Welcome To Tajinder's English Classes", settings.DEFAULT_FROM_EMAIL, to_email
@@ -386,26 +395,24 @@ class Sign_Up(SuccessMessageMixin, CreateView):
             html_content = htmly.render(d)
             # msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
             # msg.attach_alternative(html_content, "text/html")
-            # msg.send()
+            #msg.send()
             return render(request, 'account-verify.html', locals())
         return render(request, self.template_name, locals())
-
     def get(self, request, *args, **kwargs):
-        form = self.form_class
-        return render(request, self.template_name, locals())
+        form  = self.form_class
+        return render(request,self.template_name,locals())
 
 
 class Contact_us_save(View):
     model = Contact_Us
     form_class = Contact_Us_Form
     template_name = 'contact-meesage.html'
-
-    def post(self, request, *args, **kwargs):
+    def post(self,request,*args, **kwargs):
         form = self.form_class(request.POST)
         if form.is_valid():
             email = form.cleaned_data['email']
             form.save()
-            d = ({'email': email, 'WEB_SITE_URL': WEB_SITE_URL})
+            d = ({'email': email,'WEB_SITE_URL':WEB_SITE_URL})
             plaintext = get_template('email-template/email.txt')
             htmly = get_template('email-template/confirm-contact.html')
             subject, from_email, to = "Welcome To Tajinder's English Classes. Thank you for Contact us", settings.DEFAULT_FROM_EMAIL, email
@@ -413,15 +420,17 @@ class Contact_us_save(View):
             html_content = htmly.render(d)
             # msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
             # msg.attach_alternative(html_content, "text/html")
-            # msg.send()
+            #msg.send()
             # messages.success(request, "Thank you for Contact us")
             return render(request, self.template_name, locals())
         messages.success(request, "Something went wrong")
-        return render(request, self.template_name, locals())
+        return render(request,self.template_name,locals())
+
+
 
 
 def register_send_mails(emails):
-    d = ({'email': emails, 'WEB_SITE_URL': WEB_SITE_URL})
+    d = ({'email': emails,'WEB_SITE_URL':WEB_SITE_URL})
     plaintext = get_template('email-template/email.txt')
     htmly = get_template('email-template/welcome.html')
     subject, from_email, to = "Welcome To Tajinder's English Classes", settings.DEFAULT_FROM_EMAIL, emails
@@ -429,7 +438,7 @@ def register_send_mails(emails):
     html_content = htmly.render(d)
     # msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
     # msg.attach_alternative(html_content, "text/html")
-    # msg.send()
+    #msg.send()
 
 
 def activate(request, uidb64, token):
@@ -452,15 +461,18 @@ def activate(request, uidb64, token):
         # return HttpResponse('Activation link is invalid!')
 
 
-class Dashboard(LogoutIfNotStaffMixin, TemplateView):
+
+
+
+
+class Dashboard(LogoutIfNotStaffMixin,TemplateView):
     model = User_Profile
     template_name = 'admin/dashboard.html'
-
-    # paginate_by = 100  # if pagination is desired
+    #paginate_by = 100  # if pagination is desired
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['list'] = self.model.objects.all().count()
-        context['guest'] = User.objects.filter(user_type=0, is_staff=0).count()
+        context['guest'] = User.objects.filter(user_type=0,is_staff=0).count()
         context['teacher'] = User.objects.filter(user_type=1).count()
         context['student'] = User.objects.filter(user_type=2).count()
         context['paid'] = User.objects.filter(user_type=3).count()
@@ -470,27 +482,30 @@ class Dashboard(LogoutIfNotStaffMixin, TemplateView):
         return context
 
 
+
 # users
 def profile(request):
-    return render(request, 'admin/profile.html')
+    return render(request , 'admin/profile.html')
 
 
-class List_All_Contact(LogoutIfNotStaffMixin, TemplateView):
+
+
+
+
+class List_All_Contact(LogoutIfNotStaffMixin,TemplateView):
     model = Contact_Us
     template_name = 'admin/contact-list.html'
-
-    # paginate_by = 100  # if pagination is desired
+    #paginate_by = 100  # if pagination is desired
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['list'] = self.model.objects.all().order_by('-id')
         return context
 
 
-class Delete_Contact(SuccessMessageMixin, LogoutIfNotStaffMixin, View):
+class Delete_Contact(SuccessMessageMixin, LogoutIfNotStaffMixin,View):
     model = Contact_Us
-    success_message = 'Contact Deleted Successfully'
+    success_message ='Contact Deleted Successfully'
     success_url = reverse_lazy('contact_list')
-
     def get(self, request, *args, **kwargs):
         id = kwargs['pk']
         self.model.objects.filter(id=id).delete()
@@ -498,58 +513,48 @@ class Delete_Contact(SuccessMessageMixin, LogoutIfNotStaffMixin, View):
         return redirect(self.success_url)
 
 
-class User_Edit(LogoutIfNotStaffMixin, View):
+
+class User_Edit(LogoutIfNotStaffMixin,View):
     model = User_Profile
     template_name = 'admin/user-edit.html'
-
-    def get(self, request, *args, **kwargs):
+    def get(self,request,*args, **kwargs):
         user_id = kwargs['pk']
         list = self.model.objects.filter(user_id=user_id)
         Main_Course_Category_list = Main_Course_Category_Db.objects.all()
 
-        return render(request, self.template_name, locals())
-
-    def post(self, request, *args, **kwargs):
+        return render(request,self.template_name,locals())
+    def post(self,request,*args, **kwargs):
         user_id = request.POST['user_id']
         exp_date = request.POST['exp_date']
         user_type = request.POST['user_type']
-        password = request.POST.get('password', '')
         main_course_category_id = request.POST['main_course_category_id']
         main_course_category_id = Main_Course_Category_Db.objects.get(id=main_course_category_id)
         exp_date = datetime.datetime.strptime(exp_date, "%Y-%m-%d").date()
         if int(user_type) == 1:
-            User.objects.filter(pk=user_id).update(user_type=user_type, is_staff=1)
-            if password:
-                user = User.objects.get(pk=user_id)
-                user.set_password(password)
-                user.save()
+            User.objects.filter(pk=user_id).update(user_type=user_type,is_staff=1)
         else:
-            User.objects.filter(pk=user_id).update(user_type=user_type, is_staff=0)
-            if password:
-                user = User.objects.get(pk=user_id)
-                user.set_password(password)
-                user.save()
-        self.model.objects.filter(user_id=user_id).update(exp_date=exp_date,
-                                                          main_course_category_id=main_course_category_id)
+            User.objects.filter(pk=user_id).update(user_type=user_type,is_staff=0)
+        self.model.objects.filter(user_id=user_id).update(exp_date=exp_date,main_course_category_id=main_course_category_id)
         list = self.model.objects.filter(user_id=user_id)
         Main_Course_Category_list = Main_Course_Category_Db.objects.all()
         messages.success(request, "User Updated Successfully")
-        return render(request, self.template_name, locals())
+        return render(request,self.template_name,locals())
+
 
 
 def multi_user_edit(request):
     if request.method == "POST":
-        form = Multi_User_Edit_Form(request.POST)
+        form= Multi_User_Edit_Form(request.POST)
         user_type = request.POST['user_type']
         exp_date = request.POST['exp_date']
         exp_date = datetime.datetime.strptime(exp_date, "%Y-%m-%d").date()
         if form.is_valid():
             for xxx in form.cleaned_data['students']:
                 if int(user_type) == 1:
-                    User.objects.filter(id=xxx.id).update(user_type=user_type, is_staff=1)
+                    User.objects.filter(id=xxx.id).update(user_type=user_type,is_staff=1)
                     User_Profile.objects.filter(user_id=xxx.id).update(exp_date=exp_date)
                 else:
-                    User.objects.filter(id=xxx.id).update(user_type=user_type, is_staff=0)
+                    User.objects.filter(id=xxx.id).update(user_type=user_type,is_staff=0)
                     User_Profile.objects.filter(user_id=xxx.id).update(exp_date=exp_date)
             messages.success(request, "User Updated Successfully")
     else:
@@ -557,22 +562,23 @@ def multi_user_edit(request):
     return render(request, 'admin/multi-user-edit.html', locals())
 
 
-class List_All_User(LogoutIfNotStaffMixin, TemplateView):
+
+
+class List_All_User(LogoutIfNotStaffMixin,TemplateView):
     model = User_Profile
     template_name = 'admin/user-list.html'
-
-    # paginate_by = 100  # if pagination is desired
+    #paginate_by = 100  # if pagination is desired
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['list'] = self.model.objects.all().order_by('-id')
         return context
 
 
-class Delete_User(SuccessMessageMixin, LogoutIfNotStaffMixin, View):
-    model = User_Profile
-    success_message = 'User Deleted Successfully'
-    success_url = reverse_lazy('users')
 
+class Delete_User(SuccessMessageMixin, LogoutIfNotStaffMixin,View):
+    model = User_Profile
+    success_message ='User Deleted Successfully'
+    success_url = reverse_lazy('users')
     def get(self, request, *args, **kwargs):
         id = kwargs['pk']
         self.model.objects.filter(user_id=id).delete()
@@ -581,65 +587,63 @@ class Delete_User(SuccessMessageMixin, LogoutIfNotStaffMixin, View):
         return redirect(self.success_url)
 
 
-class List_Paid_User(LogoutIfNotStaffMixin, TemplateView):
+
+
+class List_Paid_User(LogoutIfNotStaffMixin,TemplateView):
     model = User_Profile
     template_name = 'admin/user-paid.html'
-
     # #paginate_by = 100  # if pagination is desired
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['list'] = self.model.objects.all().order_by('-id')
         return context
 
-
-class List_Students_User(LogoutIfNotStaffMixin, TemplateView):
+class List_Students_User(LogoutIfNotStaffMixin,TemplateView):
     model = User_Profile
     template_name = 'admin/students.html'
-
     # #paginate_by = 100  # if pagination is desired
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['list'] = self.model.objects.all().order_by('-id')
         return context
 
-
-class List_Guest_User(LogoutIfNotStaffMixin, TemplateView):
+class List_Guest_User(LogoutIfNotStaffMixin,TemplateView):
     model = User_Profile
     template_name = 'admin/guest.html'
-
     # #paginate_by = 100  # if pagination is desired
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['list'] = self.model.objects.all().order_by('-id')
         return context
 
-
-class List_Teacher_User(LogoutIfNotStaffMixin, TemplateView):
+class List_Teacher_User(LogoutIfNotStaffMixin,TemplateView):
     model = User_Profile
     template_name = 'admin/teachers.html'
-
     # #paginate_by = 100  # if pagination is desired
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['list'] = self.model.objects.all().order_by('-id')
         return context
+
+
+
 
 
 # batches
 
 
-class Add_Batch(SuccessMessageMixin, LogoutIfNotStaffMixin, CreateView):
+class Add_Batch(SuccessMessageMixin,LogoutIfNotStaffMixin,CreateView):
     model = Batch_Db
     form_class = Batch_Form
     success_url = reverse_lazy('view_batches')
-    success_message = ' Batch Added Successfully'
+    success_message =' Batch Added Successfully'
     template_name = 'admin/batch-add.html'
 
 
-class List_Batch(LogoutIfNotStaffMixin, TemplateView):
+
+class List_Batch(LogoutIfNotStaffMixin,TemplateView):
     model = Batch_Db
     template_name = 'admin/batch-list.html'
-
     #  = 100  # if pagination is desired
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -647,129 +651,57 @@ class List_Batch(LogoutIfNotStaffMixin, TemplateView):
         return context
 
 
-def Edit_Batch(request, pk):
-    post = get_object_or_404(Batch_Db, pk=pk)
-    list = Batch_Db.objects.filter(id=pk)
-    stu_list = []
-    for student in list:
-        for xx in student.students.all():
-            stu_list.append(str(xx.id))
-    if request.method == "POST":
-        students = request.POST.getlist("students", "")
-        form = Batch_Form(request.POST, instance=post)
-        if form.is_valid():  # All validation rules pass
-            form.save()
-        li_dif = [i for i in stu_list + students if i not in stu_list or i not in students]
-        if li_dif != []:
-            live_list = Live_Db.objects.filter(batch=pk)
-            for xx in li_dif:
-                print(live_list)
-                for live in live_list:
-                    Live_Notification_Db.objects.create(student_id=xx, notification_id=live.id, title=live.title,
-                                                        image=live.image, details=live.details)
-        messages.success(request, 'Batch Updated Successfully')
 
-        return redirect('view_batches')
-
-    else:
-        form = Batch_Form(instance=post)
-    return render(request, 'admin/batch-edit.html', locals())
-
-
-# class Edit_Batch(SuccessMessageMixin, LogoutIfNotStaffMixin,UpdateView):
-#     model = Batch_Db
-#     form_class = Batch_Form
-#     template_name = 'admin/batch-edit.html'
-#     success_message ='Batch Updated Successfully'
-#     success_url = reverse_lazy('view_batches')
-
-
-# def get(self,request,*args, **kwargs):
-#     list = Batch_Db.objects.all().order_by('-id')
-#     form = Batch_Form()
-#     print("heyyyyyyyy")
-#     return render(request, 'admin/batch-edit.html',locals())
-# def post(self,request,*args, **kwargs):
-#     print("posttttttttttttttttttttttt")
-#     list = Batch_Db.objects.all()
-#     batch_id = request.POST.getlist('batch')
-#     print("post1",list)
-#     print("post2",batch_id)
-# form = Live__Form(request.POST,request.FILES)
-# if form.is_valid():
-#     form.save()
-#     notification_id= Live_Db.objects.latest('id')
-#     # print(notification_id.id)
-#     if len(batch_id) != 0:
-#         image = form.cleaned_data.get('image')
-#         print(image)
-#         # id = form.cleaned_data.get('id')
-#         # print(id)
-#         details = form.cleaned_data.get('details')
-#         print(details)
-#         print('------------------------')
-#         if image or details:
-#             messages.success(request,'Live Successfully Sent')
-#             for i in batch_id:
-#                 list =  Batch_Db.objects.filter(id=i)
-#                 for x in list:
-#                     for b in x.students.all():
-#                         form_1 = Live_Student_Form(request.POST, request.FILES)
-#                         form_11 =form_1.save(commit=False)
-#                         form_11.student_id=b.id
-#                         form_11.notification_id=notification_id.id
-#                         form_11.save()
-#
-#
-#                         # Student_Notification_Db.objects.create(notification_id=notification_id.id,student_id=b.id)
-#
-#                         devices = FCMDevice.objects.filter(user_id=b.id)
-#                         aa ={'data':form.data,'notification_code':1}
-#                         devices.send_message(title="HinduMiddle School",body="NeW Message",data={"test":aa})
-#             return redirect('view_live')
-#
-
-
-class Delete_Batch(SuccessMessageMixin, LogoutIfNotStaffMixin, View):
+class Edit_Batch(SuccessMessageMixin, LogoutIfNotStaffMixin,UpdateView):
     model = Batch_Db
-    success_message = 'Batch Deleted Successfully'
+    form_class = Batch_Form
+    template_name = 'admin/batch-edit.html'
+    success_message ='Batch Updated Successfully'
     success_url = reverse_lazy('view_batches')
 
+
+
+
+class Delete_Batch(SuccessMessageMixin,LogoutIfNotStaffMixin,View):
+    model = Batch_Db
+    success_message ='Batch Deleted Successfully'
+    success_url = reverse_lazy('view_batches')
     def get(self, request, *args, **kwargs):
         id = kwargs['pk']
         self.model.objects.filter(id=id).delete()
         messages.error(request, self.success_message)
         return redirect(self.success_url)
 
-
 # batches
 
 
-# Main_Course_Category
-class Add_Main_Course_Category(SuccessMessageMixin, LogoutIfNotStaffMixin, CreateView):
+#Main_Course_Category
+class Add_Main_Course_Category(SuccessMessageMixin,LogoutIfNotStaffMixin,CreateView):
     model = Main_Course_Category_Db
     form_class = Main_Course_Category_Form
     success_url = reverse_lazy('list_course_category')
-    success_message = ' Main Course Category Added Successfully'
+    success_message =' Main Course Category Added Successfully'
     template_name = 'admin/course-category-add.html'
 
 
-class List_Main_Course_Category(LogoutIfNotStaffMixin, TemplateView):
+
+
+class List_Main_Course_Category(LogoutIfNotStaffMixin,TemplateView):
     model = Main_Course_Category_Db
     template_name = 'admin/course-category-list.html'
-
-    # paginate_by = 100  # if pagination is desired
+    #paginate_by = 100  # if pagination is desired
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['list'] = self.model.objects.all().order_by('-id')
         return context
 
 
-class Delete_Main_Course_Category(SuccessMessageMixin, LogoutIfNotStaffMixin, View):
-    model = Main_Course_Category_Db
-    success_message = 'Main Course Category Deleted Successfully'
-    success_url = reverse_lazy('list_course_category')
 
+
+class Delete_Main_Course_Category(SuccessMessageMixin,LogoutIfNotStaffMixin,View):
+    model = Main_Course_Category_Db
+    success_message ='Main Course Category Deleted Successfully'
+    success_url = reverse_lazy('list_course_category')
     def get(self, request, *args, **kwargs):
         id = kwargs['pk']
         self.model.objects.filter(id=id).delete()
@@ -777,27 +709,28 @@ class Delete_Main_Course_Category(SuccessMessageMixin, LogoutIfNotStaffMixin, Vi
         return redirect(self.success_url)
 
 
-class Edit_Main_Course_Category(SuccessMessageMixin, LogoutIfNotStaffMixin, UpdateView):
+class Edit_Main_Course_Category(SuccessMessageMixin,LogoutIfNotStaffMixin,UpdateView):
     model = Main_Course_Category_Db
     form_class = Main_Course_Category_Form
     template_name = 'admin/course-category-edit.html'
-    success_message = 'Main Course Category Updated Successfully'
+    success_message ='Main Course Category Updated Successfully'
     success_url = reverse_lazy('list_course_category')
 
 
-class Add_Super_Course_Category(SuccessMessageMixin, LogoutIfNotStaffMixin, CreateView):
+
+class Add_Super_Course_Category(SuccessMessageMixin,LogoutIfNotStaffMixin,CreateView):
     model = Super_Course_Category_Db
     form_class = Super_Course_Category_Form
     success_url = reverse_lazy('course_super_category_list')
-    success_message = ' Super Course Category Added Successfully'
+    success_message =' Super Course Category Added Successfully'
     template_name = 'admin/course-super-category-add.html'
 
 
-class List_Super_Course_Category(LogoutIfNotStaffMixin, ListView, ):
+
+class List_Super_Course_Category(LogoutIfNotStaffMixin,ListView,):
     model = Super_Course_Category_Db
     template_name = 'admin/course-super-category-list.html'
     paginate_by = 10  # if pagination is desired
-
     def get_context_data(self, **kwargs):
         context = super(List_Super_Course_Category, self).get_context_data(**kwargs)
         list = Super_Course_Category_Db.objects.all()
@@ -819,11 +752,11 @@ class List_Super_Course_Category(LogoutIfNotStaffMixin, ListView, ):
         return context
 
 
-class Delete_Super_Course_Category(SuccessMessageMixin, LogoutIfNotStaffMixin, View):
-    model = Super_Course_Category_Db
-    success_message = 'Super Course Category Deleted Successfully'
-    success_url = reverse_lazy('course_super_category_list')
 
+class Delete_Super_Course_Category(SuccessMessageMixin,LogoutIfNotStaffMixin,View):
+    model = Super_Course_Category_Db
+    success_message ='Super Course Category Deleted Successfully'
+    success_url = reverse_lazy('course_super_category_list')
     def get(self, request, *args, **kwargs):
         id = kwargs['pk']
         self.model.objects.filter(id=id).delete()
@@ -831,55 +764,58 @@ class Delete_Super_Course_Category(SuccessMessageMixin, LogoutIfNotStaffMixin, V
         return redirect(self.success_url)
 
 
-class Edit_Super_Course_Category(SuccessMessageMixin, LogoutIfNotStaffMixin, UpdateView):
+class Edit_Super_Course_Category(SuccessMessageMixin,LogoutIfNotStaffMixin,UpdateView):
     model = Super_Course_Category_Db
     form_class = Super_Course_Category_Form
     template_name = 'admin/course-super-category-edit.html'
-    success_message = 'Super Course Category Updated Successfully'
+    success_message ='Super Course Category Updated Successfully'
     success_url = reverse_lazy('course_super_category_list')
 
 
+
 # Sub_Course_Category
-class Add_Sub_Course_Category(SuccessMessageMixin, LogoutIfNotStaffMixin, CreateView):
+class Add_Sub_Course_Category(SuccessMessageMixin,LogoutIfNotStaffMixin,CreateView):
     model = Sub_Course_Category_Db
     form_class = Sub_Course_Category_Form
     success_url = reverse_lazy('course_sub_category_list')
-    success_message = ' Sub Course Category Added Successfully'
+    success_message =' Sub Course Category Added Successfully'
     template_name = 'admin/course-sub-category-add.html'
+
 
 
 def load_main_course_category(request):
     main_course_category_id = request.GET.get('main_course_category_id')
     print(main_course_category_id)
     list = Super_Course_Category_Db.objects.filter(main_course_category_id=main_course_category_id)
-    return render(request, 'admin/main_course_category_dropdown.html', locals())
+    return render(request, 'admin/main_course_category_dropdown.html',locals())
 
 
 def load_sub_course_category(request):
     super_course_category_id = request.GET.get('super_course_category_id')
     print(super_course_category_id)
     list = Sub_Course_Category_Db.objects.filter(super_course_category_id=super_course_category_id)
-    return render(request, 'admin/main_course_category_dropdown.html', locals())
-
+    return render(request, 'admin/main_course_category_dropdown.html',locals())
 
 def load_user(request):
     main_course_category_id = request.GET.get('main_course_category_id')
     print(main_course_category_id)
-    if main_course_category_id == '':
-        userList = User.objects.filter(user_type__in=[1, 2])
+    if main_course_category_id =='':
+        userList = User.objects.filter(user_type__in = [1,2])
     else:
         list = User_Profile.objects.filter(main_course_category_id=main_course_category_id)
         userList = User.objects.filter(Q(user_profile__in=list) | Q(user_type=1)).order_by('user_type')
     for ls in userList:
         print(ls.username, ls.user_type)
-    return render(request, 'admin/user_dropdown.html', locals())
+    return render(request, 'admin/user_dropdown.html',locals())
 
 
-class List_Sub_Course_Category(LogoutIfNotStaffMixin, ListView):
+
+
+
+class List_Sub_Course_Category(LogoutIfNotStaffMixin,ListView):
     model = Sub_Course_Category_Db
     template_name = 'admin/course-sub-category-list.html'
     paginate_by = 10  # if pagination is desired
-
     # def get_context_data(self, **kwargs):
     #     context = super().get_context_data(**kwargs)
     #     context['list'] = self.model.objects.all().order_by('-id')
@@ -912,11 +848,14 @@ class List_Sub_Course_Category(LogoutIfNotStaffMixin, ListView):
         return context
 
 
-class Delete_Sub_Course_Category(SuccessMessageMixin, LogoutIfNotStaffMixin, View):
-    model = Sub_Course_Category_Db
-    success_message = 'Sub Course Category Deleted Successfully'
-    success_url = reverse_lazy('course_sub_category_list')
 
+
+
+
+class Delete_Sub_Course_Category(SuccessMessageMixin, LogoutIfNotStaffMixin,View):
+    model = Sub_Course_Category_Db
+    success_message ='Sub Course Category Deleted Successfully'
+    success_url = reverse_lazy('course_sub_category_list')
     def get(self, request, *args, **kwargs):
         id = kwargs['pk']
         self.model.objects.filter(id=id).delete()
@@ -924,84 +863,86 @@ class Delete_Sub_Course_Category(SuccessMessageMixin, LogoutIfNotStaffMixin, Vie
         return redirect(self.success_url)
 
 
-class Edit_Sub_Course_Category(SuccessMessageMixin, LogoutIfNotStaffMixin, UpdateView):
+class Edit_Sub_Course_Category(SuccessMessageMixin,LogoutIfNotStaffMixin,UpdateView):
     model = Sub_Course_Category_Db
     form_class = Sub_Course_Category_Form
     template_name = 'admin/course-sub-category-edit.html'
-    success_message = 'Sub Course Category Updated Successfully'
+    success_message ='Sub Course Category Updated Successfully'
     success_url = reverse_lazy('course_sub_category_list')
 
 
-class Add_Course_Content(SuccessMessageMixin, LogoutIfNotStaffMixin, CreateView):
+
+
+
+class Add_Course_Content(SuccessMessageMixin,LogoutIfNotStaffMixin,CreateView):
     model = Course_Content_Db
     form_class = Course_Content_Form
-
     def get(self, request, *args, **kwargs):
         form = Course_Content_Form()
-        return render(request, 'admin/course-content-add.html', locals())
-
+        return render(request, 'admin/course-content-add.html',locals())
     def post(self, request, *args, **kwargs):
-        form = Course_Content_Form(request.POST, request.FILES)
+        form = Course_Content_Form(request.POST,request.FILES)
         if form.is_valid():
-            xxx = form.save()
-            if xxx.pdf:
-                aaa = xxx.pdf.path
-                # content_data = self.model.objects.get(id=xxx.id)
-                ext = aaa.split('.')
-                if smart_str(ext[1]) != 'pdf':
-                    if smart_str(ext[1]) == 'txt':
-                        pdf = FPDF()
-                        pdf.add_page()
-                        pdf.set_font("Arial", size=8)
-                        f = open(aaa, "r")
-                        for x in f:
-                            pdf.cell(200, 6, txt=x, ln=3, align='l')
-                        pdf.output(ext[0] + '.pdf')
-                        bbb_1 = ext[0].replace(BASE_DIR + '/uploads/', '')
-                        self.model.objects.filter(id=xxx.id).update(pdf=bbb_1 + '.pdf')
-                    elif smart_str(ext[1]) == 'jpg' or smart_str(ext[1]) == 'png':
-                        print("Successfully save")
-                    else:
-                        listener = ('127.0.0.1', 2002)
-                        converter = DocumentConverter(listener)
-                        converter.convert(aaa, smart_str(ext[0]) + '.pdf')
-                        print(BASE_DIR + '/ieltsclasses/uploads/')
-                        bbb = ext[0].replace(BASE_DIR + '/uploads/', '')
-                        self.model.objects.filter(id=xxx.id).update(pdf=bbb + '.pdf')
-                        pages = convert_from_path(ext[0] + '.pdf', 100)
-            messages.success(request, 'Course Content Added Successfully')
-            return redirect('course_content_list')
+           xxx =form.save()
+           if xxx.pdf:
+               aaa = xxx.pdf.path
+               # content_data = self.model.objects.get(id=xxx.id)
+               ext = aaa.split('.')
+               if smart_str(ext[1]) != 'pdf':
+                   if smart_str(ext[1]) == 'txt':
+                       pdf = FPDF()
+                       pdf.add_page()
+                       pdf.set_font("Arial", size=8)
+                       f = open(aaa, "r")
+                       for x in f:
+                           pdf.cell(200, 6, txt=x, ln=3, align='l')
+                       pdf.output(ext[0] + '.pdf')
+                       bbb_1 = ext[0].replace(BASE_DIR + '/uploads/', '')
+                       self.model.objects.filter(id=xxx.id).update(pdf=bbb_1 + '.pdf')
+                   elif smart_str(ext[1]) == 'jpg' or smart_str(ext[1]) == 'png':
+                       print("Successfully save");
+                   else:
+                       listener = ('127.0.0.1', 2002)
+                       converter = DocumentConverter(listener)
+                       converter.convert(aaa, smart_str(ext[0]) + '.pdf')
+                       print(BASE_DIR + '/ieltsclasses/uploads/')
+                       bbb = ext[0].replace(BASE_DIR + '/uploads/', '')
+                       self.model.objects.filter(id=xxx.id).update(pdf=bbb + '.pdf')
+                       pages = convert_from_path(ext[0] + '.pdf', 100)
+           messages.success(request, 'Course Content Added Successfully')
+           return redirect('course_content_list')
 
-            # i = 1
-            # for page in pages:
-            #     i += 1
-            #     page.save(ext[0] + str(i) + '.jpg', 'JPEG')
-            #     xxx = ext[0] + str(i) + '.jpg'
-            #     bbb__ = xxx.replace(BASE_DIR + '/uploads/', '')
-            #     Images_data.objects.create(course_id=content_data, image=bbb__)
-            # elif smart_str(ext[1]) == 'pdf':
-            # pages = convert_from_path(aaa, 100)
-            # i = 1
-            # for page in pages:
-            #     i += 1
-            #     page.save(ext[0] + str(i) + '.jpg', 'JPEG')
-            #     xxx = ext[0] + str(i) + '.jpg'
-            #     bbb__ = xxx.replace(BASE_DIR + '/uploads/', '')
-            #     Images_data.objects.create(course_id=content_data, image=bbb__)
-            # form = self.form_class()
+
+                       # i = 1
+                   # for page in pages:
+                   #     i += 1
+                   #     page.save(ext[0] + str(i) + '.jpg', 'JPEG')
+                   #     xxx = ext[0] + str(i) + '.jpg'
+                   #     bbb__ = xxx.replace(BASE_DIR + '/uploads/', '')
+                   #     Images_data.objects.create(course_id=content_data, image=bbb__)
+               # elif smart_str(ext[1]) == 'pdf':
+                       # pages = convert_from_path(aaa, 100)
+                       # i = 1
+                       # for page in pages:
+                       #     i += 1
+                       #     page.save(ext[0] + str(i) + '.jpg', 'JPEG')
+                       #     xxx = ext[0] + str(i) + '.jpg'
+                       #     bbb__ = xxx.replace(BASE_DIR + '/uploads/', '')
+                       #     Images_data.objects.create(course_id=content_data, image=bbb__)
+           # form = self.form_class()
 
         return render(request, 'admin/course-content-add.html', locals())
 
 
-class List_Course_Content(LogoutIfNotStaffMixin, TemplateView):
+class List_Course_Content(LogoutIfNotStaffMixin,TemplateView):
     model = Course_Content_Db
     template_name = 'admin/course-content-list.html'
-
     # #paginate_by = 100  # if pagination is desired
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['list'] = self.model.objects.filter(trash=1)
         return context
+
 
 
 #
@@ -1013,104 +954,104 @@ class List_Course_Content(LogoutIfNotStaffMixin, TemplateView):
 #     success_url = reverse_lazy('course_content_list')
 #
 
-class Edit_Course_Content(SuccessMessageMixin, LogoutIfNotStaffMixin, UpdateView):
+class Edit_Course_Content(SuccessMessageMixin,LogoutIfNotStaffMixin,UpdateView):
     model = Course_Content_Db
     form_class = Course_Content_Form
     template_name = 'admin/course-content-edit.html'
-
     def get(self, request, *args, **kwargs):
         id = kwargs['pk']
-        instance = self.model.objects.get(id=id)
+        instance= self.model.objects.get(id=id)
         form = Course_Content_Form(instance=instance)
         return render(request, self.template_name, locals())
-
     def post(self, request, *args, **kwargs):
         id = kwargs['pk']
         instance = self.model.objects.get(id=id)
-        form = Course_Content_Form(request.POST, request.FILES, instance=instance)
+        form = Course_Content_Form(request.POST, request.FILES,instance=instance)
         if form.is_valid():
-            xxx = form.save()
-            if xxx.pdf:
-                aaa = xxx.pdf.path
-                content_data = self.model.objects.get(id=xxx.id)
-                ext = aaa.split('.')
-                if smart_str(ext[1]) != 'pdf':
-                    if smart_str(ext[1]) == 'txt':
-                        pdf = FPDF()
-                        pdf.add_page()
-                        pdf.set_font("Arial", size=8)
-                        f = open(aaa, "r")
-                        for x in f:
-                            pdf.cell(200, 6, txt=x, ln=3, align='l')
-                        pdf.output(ext[0] + '.pdf')
-                        bbb_1 = ext[0].replace(BASE_DIR + '/uploads/', '')
-                        self.model.objects.filter(id=xxx.id).update(pdf=bbb_1 + '.pdf')
-                    else:
-                        listener = ('127.0.0.1', 2002)
-                        converter = DocumentConverter(listener)
-                        converter.convert(aaa, smart_str(ext[0]) + '.pdf')
-                        print(BASE_DIR + '/ieltsclasses/uploads/')
-                        bbb = ext[0].replace(BASE_DIR + '/uploads/', '')
-                        self.model.objects.filter(id=xxx.id).update(pdf=bbb + '.pdf')
-                        pages = convert_from_path(ext[0] + '.pdf', 100)
-            messages.success(request, 'Course Content Updated Successfully')
-            return redirect('course_content_list')
+           xxx =form.save()
+           if xxx.pdf:
+               aaa = xxx.pdf.path
+               content_data = self.model.objects.get(id=xxx.id)
+               ext = aaa.split('.')
+               if smart_str(ext[1]) != 'pdf':
+                   if smart_str(ext[1]) == 'txt':
+                       pdf = FPDF()
+                       pdf.add_page()
+                       pdf.set_font("Arial", size=8)
+                       f = open(aaa, "r")
+                       for x in f:
+                           pdf.cell(200, 6, txt=x, ln=3, align='l')
+                       pdf.output(ext[0] + '.pdf')
+                       bbb_1 = ext[0].replace(BASE_DIR + '/uploads/', '')
+                       self.model.objects.filter(id=xxx.id).update(pdf=bbb_1 + '.pdf')
+                   else:
+                       listener = ('127.0.0.1', 2002)
+                       converter = DocumentConverter(listener)
+                       converter.convert(aaa, smart_str(ext[0]) + '.pdf')
+                       print(BASE_DIR + '/ieltsclasses/uploads/')
+                       bbb = ext[0].replace(BASE_DIR + '/uploads/', '')
+                       self.model.objects.filter(id=xxx.id).update(pdf=bbb + '.pdf')
+                       pages = convert_from_path(ext[0] + '.pdf', 100)
+           messages.success(request, 'Course Content Updated Successfully')
+           return redirect('course_content_list')
 
-            # i = 1
-            # for page in pages:
-            #     i += 1
-            #     page.save(ext[0] + str(i) + '.jpg', 'JPEG')
-            #     xxx = ext[0] + str(i) + '.jpg'
-            #     bbb__ = xxx.replace(BASE_DIR + '/uploads/', '')
-            #     Images_data.objects.create(course_id=content_data, image=bbb__)
-            # elif smart_str(ext[1]) == 'pdf':
-            # pages = convert_from_path(aaa, 100)
-            # i = 1
-            # for page in pages:
-            #     i += 1
-            #     page.save(ext[0] + str(i) + '.jpg', 'JPEG')
-            #     xxx = ext[0] + str(i) + '.jpg'
-            #     bbb__ = xxx.replace(BASE_DIR + '/uploads/', '')
-            #     Images_data.objects.create(course_id=content_data, image=bbb__)
+
+
+                   # i = 1
+                   # for page in pages:
+                   #     i += 1
+                   #     page.save(ext[0] + str(i) + '.jpg', 'JPEG')
+                   #     xxx = ext[0] + str(i) + '.jpg'
+                   #     bbb__ = xxx.replace(BASE_DIR + '/uploads/', '')
+                   #     Images_data.objects.create(course_id=content_data, image=bbb__)
+               # elif smart_str(ext[1]) == 'pdf':
+                       # pages = convert_from_path(aaa, 100)
+                       # i = 1
+                       # for page in pages:
+                       #     i += 1
+                       #     page.save(ext[0] + str(i) + '.jpg', 'JPEG')
+                       #     xxx = ext[0] + str(i) + '.jpg'
+                       #     bbb__ = xxx.replace(BASE_DIR + '/uploads/', '')
+                       #     Images_data.objects.create(course_id=content_data, image=bbb__)
         return render(request, self.template_name, locals())
 
 
-class Delete_Course_Content(SuccessMessageMixin, LogoutIfNotStaffMixin, View):
+class Delete_Course_Content(SuccessMessageMixin,LogoutIfNotStaffMixin,View):
     model = Course_Content_Db
-    success_message = 'Course Content Deleted Successfully'
+    success_message ='Course Content Deleted Successfully'
     success_url = reverse_lazy('course_content_list')
-
     def get(self, request, *args, **kwargs):
         id = kwargs['pk']
         self.model.objects.filter(id=id).update(trash=0)
-        messages.error(request, self.success_message)
+        messages.error(request,self.success_message)
         return redirect('course_content_list')
 
 
-class Add_Course(SuccessMessageMixin, LogoutIfNotStaffMixin, CreateView):
+
+
+class Add_Course(SuccessMessageMixin,LogoutIfNotStaffMixin,CreateView):
     model = Course_Db
     form_class = Course_Form
     success_url = reverse_lazy('course_list')
-    success_message = 'Course Added Successfully'
+    success_message ='Course Added Successfully'
     template_name = 'admin/course-add.html'
 
 
-class List_Course(LogoutIfNotStaffMixin, TemplateView):
+
+
+class List_Course(LogoutIfNotStaffMixin,TemplateView):
     model = Course_Db
     template_name = 'admin/course-list.html'
-
     # #paginate_by = 100  # if pagination is desired
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['list'] = self.model.objects.all().order_by('-id')
         return context
 
-
-class Delete_Course(SuccessMessageMixin, LogoutIfNotStaffMixin, View):
+class Delete_Course(SuccessMessageMixin,LogoutIfNotStaffMixin,View):
     model = Course_Db
-    success_message = 'Course Deleted Successfully'
+    success_message ='Course Deleted Successfully'
     success_url = reverse_lazy('course_list')
-
     def get(self, request, *args, **kwargs):
         id = kwargs['pk']
         self.model.objects.filter(id=id).delete()
@@ -1118,45 +1059,47 @@ class Delete_Course(SuccessMessageMixin, LogoutIfNotStaffMixin, View):
         return redirect(self.success_url)
 
 
-class Edit_Course(SuccessMessageMixin, LogoutIfNotStaffMixin, UpdateView):
+class Edit_Course(SuccessMessageMixin,LogoutIfNotStaffMixin,UpdateView):
     model = Course_Db
     form_class = Course_Form
     template_name = 'admin/course-edit.html'
-    success_message = 'Course Updated Successfully'
+    success_message ='Course Updated Successfully'
     success_url = reverse_lazy('course_list')
 
 
+
+
+
+
 def fee_list(request):
-    return render(request, 'admin/course-fee-list.html')
-
-
+    return render(request , 'admin/course-fee-list.html')
 # courses
 
 # blog
-class Add_Blog_Category(SuccessMessageMixin, LogoutIfNotStaffMixin, CreateView):
+class Add_Blog_Category(SuccessMessageMixin,LogoutIfNotStaffMixin,CreateView):
     model = Blog_Category_Db
     form_class = Blog_Category_Form
     success_url = reverse_lazy('list_blog_category')
-    success_message = ' Blog Category Added Successfully'
+    success_message =' Blog Category Added Successfully'
     template_name = 'admin/blog-category-add.html'
 
 
-class List_Blog_Category(TemplateView, LogoutIfNotStaffMixin):
+
+
+class List_Blog_Category(TemplateView,LogoutIfNotStaffMixin):
     model = Blog_Category_Db
     template_name = 'admin/blog-category-list.html'
-
-    # paginate_by = 100  # if pagination is desired
+    #paginate_by = 100  # if pagination is desired
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['list'] = self.model.objects.all().order_by('-id')
         return context
 
 
-class Delete_Blog_Category(SuccessMessageMixin, LogoutIfNotStaffMixin, View):
+class Delete_Blog_Category(SuccessMessageMixin,LogoutIfNotStaffMixin,View):
     model = Blog_Category_Db
-    success_message = 'Blog Category Deleted Successfully'
+    success_message ='Blog Category Deleted Successfully'
     success_url = reverse_lazy('list_blog_category')
-
     def get(self, request, *args, **kwargs):
         id = kwargs['pk']
         self.model.objects.filter(id=id).delete()
@@ -1164,88 +1107,92 @@ class Delete_Blog_Category(SuccessMessageMixin, LogoutIfNotStaffMixin, View):
         return redirect(self.success_url)
 
 
-class Edit_Blog_Category(SuccessMessageMixin, LogoutIfNotStaffMixin, UpdateView):
+class Edit_Blog_Category(SuccessMessageMixin,LogoutIfNotStaffMixin,UpdateView):
     model = Blog_Category_Db
     form_class = Blog_Category_Form
     template_name = 'admin/blog-category-edit.html'
-    success_message = 'Blog Category Updated Successfully'
+    success_message ='Blog Category Updated Successfully'
     success_url = reverse_lazy('list_blog_category')
 
 
-class List_Blog(TemplateView, LogoutIfNotStaffMixin):
+
+
+class List_Blog(TemplateView,LogoutIfNotStaffMixin):
     model = Blog_Db
     template_name = 'admin/blog-list.html'
-
-    # paginate_by = 100  # if pagination is desired
+    #paginate_by = 100  # if pagination is desired
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['list'] = self.model.objects.filter(trash=1)
         return context
 
 
-class Add_Blog(SuccessMessageMixin, LogoutIfNotStaffMixin, CreateView):
+class Add_Blog(SuccessMessageMixin,LogoutIfNotStaffMixin,CreateView):
     model = Blog_Db
     form_class = Blog_Form
     success_url = reverse_lazy('blog_list')
-    success_message = ' Blog Post Added Successfully'
+    success_message =' Blog Post Added Successfully'
     template_name = 'admin/blog-add.html'
 
 
-class Edit_Blog(SuccessMessageMixin, LogoutIfNotStaffMixin, UpdateView):
+
+
+class Edit_Blog(SuccessMessageMixin,LogoutIfNotStaffMixin,UpdateView):
     model = Blog_Db
     form_class = Blog_Form
     template_name = 'admin/blog-edit.html'
-    success_message = 'Blog Post Updated Successfully'
+    success_message ='Blog Post Updated Successfully'
     success_url = reverse_lazy('blog_list')
 
 
-class Delete_Blog(SuccessMessageMixin, LogoutIfNotStaffMixin, View):
+
+class Delete_Blog(SuccessMessageMixin, LogoutIfNotStaffMixin,View):
     model = Blog_Db
-    success_message = 'Blog Post Deleted Successfully'
+    success_message ='Blog Post Deleted Successfully'
     success_url = reverse_lazy('blog_list')
-
     def get(self, request, *args, **kwargs):
         id = kwargs['pk']
         self.model.objects.filter(id=id).update(trash=0)
-        messages.error(request, self.success_message)
+        messages.error(request,self.success_message)
         return redirect('blog_list')
-
 
 # FAQs
 
 
-class Add_Faq(SuccessMessageMixin, LogoutIfNotStaffMixin, CreateView):
+
+class Add_Faq(SuccessMessageMixin,LogoutIfNotStaffMixin,CreateView):
     model = Faq_Db
     form_class = Faq_Form
     success_url = reverse_lazy('view_faqs')
-    success_message = ' FAQ Added Successfully'
+    success_message =' FAQ Added Successfully'
     template_name = 'admin/faq-add.html'
 
 
-class Edit_Faq(SuccessMessageMixin, LogoutIfNotStaffMixin, UpdateView):
+
+class Edit_Faq(SuccessMessageMixin,LogoutIfNotStaffMixin,UpdateView):
     model = Faq_Db
     form_class = Faq_Form
     template_name = 'admin/faq-edit.html'
-    success_message = 'FAQ Updated Successfully'
+    success_message ='FAQ Updated Successfully'
     success_url = reverse_lazy('view_faqs')
 
 
-class List_Faq(TemplateView, LogoutIfNotStaffMixin):
+
+class List_Faq(TemplateView,LogoutIfNotStaffMixin):
     model = Faq_Db
     template_name = 'admin/faq-list.html'
-
-    # paginate_by = 100  # if pagination is desired
+    #paginate_by = 100  # if pagination is desired
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['list'] = self.model.objects.all().order_by('-id')
         return context
 
 
-class Delete_Faq(SuccessMessageMixin, LogoutIfNotStaffMixin, View):
-    model = Faq_Db
-    success_message = 'FAQ Deleted Successfully'
-    success_url = reverse_lazy('view_faqs')
 
+class Delete_Faq(SuccessMessageMixin,LogoutIfNotStaffMixin,View):
+    model = Faq_Db
+    success_message ='FAQ Deleted Successfully'
+    success_url = reverse_lazy('view_faqs')
     def get(self, request, *args, **kwargs):
         id = kwargs['pk']
         self.model.objects.filter(id=id).delete()
@@ -1257,88 +1204,84 @@ class Delete_Faq(SuccessMessageMixin, LogoutIfNotStaffMixin, View):
 
 # Testimonials
 
-class Add_Testimonial(SuccessMessageMixin, LogoutIfNotStaffMixin, CreateView):
+class Add_Testimonial(SuccessMessageMixin,LogoutIfNotStaffMixin,CreateView):
     model = Testimonial_Db
     form_class = Testimonial_Form
     success_url = reverse_lazy('view_testimonials')
-    success_message = ' New Testimonial Added Successfully'
+    success_message =' New Testimonial Added Successfully'
     template_name = 'admin/testimonial-add.html'
 
 
-class List_Testimonial(TemplateView, LogoutIfNotStaffMixin):
+class List_Testimonial(TemplateView,LogoutIfNotStaffMixin):
     model = Testimonial_Db
     template_name = 'admin/testimonial-list.html'
-
-    # paginate_by = 100  # if pagination is desired
+    #paginate_by = 100  # if pagination is desired
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['list'] = self.model.objects.all().order_by('-id')
         return context
 
 
-class Edit_Testimonial(SuccessMessageMixin, LogoutIfNotStaffMixin, UpdateView):
+class Edit_Testimonial(SuccessMessageMixin,LogoutIfNotStaffMixin,UpdateView):
     model = Testimonial_Db
     form_class = Testimonial_Form
     template_name = 'admin/testimonial-edit.html'
-    success_message = 'Testimonial Updated Successfully'
+    success_message ='Testimonial Updated Successfully'
     success_url = reverse_lazy('view_testimonials')
 
 
-class Delete_Testimonial(SuccessMessageMixin, LogoutIfNotStaffMixin, View):
+class Delete_Testimonial(SuccessMessageMixin,LogoutIfNotStaffMixin,View):
     model = Testimonial_Db
-    success_message = 'Testimonial Deleted Successfully'
+    success_message ='Testimonial Deleted Successfully'
     success_url = reverse_lazy('view_testimonials')
-
     def get(self, request, *args, **kwargs):
         id = kwargs['pk']
         self.model.objects.filter(id=id).delete()
-        messages.error(request, self.success_message)
+        messages.error(request,self.success_message)
         return redirect('view_testimonials')
-
 
 # Testimonials
 
 # gallery
-class List_Photos(TemplateView, LogoutIfNotStaffMixin):
+class List_Photos(TemplateView,LogoutIfNotStaffMixin):
     model = Gallery_Db
     template_name = 'admin/gallery-view.html'
-
-    # paginate_by = 100  # if pagination is desired
+    #paginate_by = 100  # if pagination is desired
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['list'] = self.model.objects.all().order_by('-id')
         return context
 
 
-class Add_Photos(SuccessMessageMixin, LogoutIfNotStaffMixin, CreateView):
+class Add_Photos(SuccessMessageMixin,LogoutIfNotStaffMixin,CreateView):
     model = Gallery_Db
     form_class = Photos_Form
     success_url = reverse_lazy('view_gallery')
-    success_message = ' New Photo Added Successfully'
+    success_message =' New Photo Added Successfully'
     template_name = 'admin/gallery-add-photo.html'
 
 
-class Edit_Photos(SuccessMessageMixin, LogoutIfNotStaffMixin, View):
+
+class Edit_Photos(SuccessMessageMixin,LogoutIfNotStaffMixin,View):
     model = Gallery_Db
     form_class = Photos_Form
     template_name = 'admin/gallery-view.html'
-
-    def post(self, requset, *args, **kwargs):
+    def post(self,requset,*args,**kwargs):
         id = requset.POST['id']
         instance = self.model.objects.get(id=id)
-        form = self.form_class(requset.POST, requset.FILES, instance=instance)
+        form =self.form_class(requset.POST,requset.FILES,instance=instance)
         if form.is_valid():
             form.save()
-            messages.success(requset, 'Photo Updated Successfully')
+            messages.success(requset,'Photo Updated Successfully')
             list = self.model.objects.all()
-            return render(requset, self.template_name, locals())
+            return render(requset,self.template_name,locals())
 
 
-class Delete_Photos(SuccessMessageMixin, LogoutIfNotStaffMixin, View):
+
+class Delete_Photos(SuccessMessageMixin,LogoutIfNotStaffMixin,View):
     model = Gallery_Db
-    success_message = 'Photo Deleted Successfully'
+    success_message ='Photo Deleted Successfully'
     success_url = reverse_lazy('view_gallery')
-
     def get(self, request, *args, **kwargs):
         id = kwargs['pk']
         self.model.objects.filter(id=id).delete()
@@ -1349,45 +1292,43 @@ class Delete_Photos(SuccessMessageMixin, LogoutIfNotStaffMixin, View):
 # gallery
 
 
-class List_Blog_Trash(TemplateView, LogoutIfNotStaffMixin):
+
+class List_Blog_Trash(TemplateView,LogoutIfNotStaffMixin):
     model = Blog_Db
     template_name = 'admin/trash-blog.html'
-
-    # paginate_by = 100  # if pagination is desired
+    #paginate_by = 100  # if pagination is desired
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['list'] = self.model.objects.filter(trash=0)
         return context
 
 
-class Restore_Blog(SuccessMessageMixin, LogoutIfNotStaffMixin, View):
+class Restore_Blog(SuccessMessageMixin,LogoutIfNotStaffMixin,View):
     model = Blog_Db
-    success_message = 'Blog Restored Successfully'
+    success_message ='Blog Restored Successfully'
     success_url = reverse_lazy('view_blog_trash')
-
     def get(self, request, *args, **kwargs):
         id = kwargs['pk']
         self.model.objects.filter(id=id).update(trash=1)
-        messages.error(request, self.success_message)
+        messages.error(request,self.success_message)
         return redirect('view_blog_trash')
 
 
-class Delete_Blog_Permanent(SuccessMessageMixin, LogoutIfNotStaffMixin, View):
+class Delete_Blog_Permanent(SuccessMessageMixin,LogoutIfNotStaffMixin,View):
     model = Blog_Db
-    success_message = 'Blog Deleted Successfully'
+    success_message ='Blog Deleted Successfully'
     success_url = reverse_lazy('view_blog_trash')
-
     def get(self, request, *args, **kwargs):
         id = kwargs['pk']
         self.model.objects.filter(id=id).delete()
-        messages.error(request, self.success_message)
+        messages.error(request,self.success_message)
         return redirect('view_blog_trash')
 
 
-class List_Course_Content_Trash(LogoutIfNotStaffMixin, TemplateView):
+
+class List_Course_Content_Trash(LogoutIfNotStaffMixin,TemplateView):
     model = Course_Content_Db
     template_name = 'admin/trash-course-content.html'
-
     # #paginate_by = 100  # if pagination is desired
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -1395,139 +1336,43 @@ class List_Course_Content_Trash(LogoutIfNotStaffMixin, TemplateView):
         return context
 
 
-class Restore_Course_Content(SuccessMessageMixin, LogoutIfNotStaffMixin, View):
-    model = Course_Content_Db
-    success_message = 'Course Content Restored Successfully'
-    success_url = reverse_lazy('view_course_content_trash')
 
+class Restore_Course_Content(SuccessMessageMixin,LogoutIfNotStaffMixin,View):
+    model = Course_Content_Db
+    success_message ='Course Content Restored Successfully'
+    success_url = reverse_lazy('view_course_content_trash')
     def get(self, request, *args, **kwargs):
         id = kwargs['pk']
         self.model.objects.filter(id=id).update(trash=1)
-        messages.error(request, self.success_message)
+        messages.error(request,self.success_message)
         return redirect('view_course_content_trash')
 
-
-class Delete_Course_Content_Permanent(SuccessMessageMixin, LogoutIfNotStaffMixin, View):
+class Delete_Course_Content_Permanent(SuccessMessageMixin,LogoutIfNotStaffMixin,View):
     model = Course_Content_Db
-    success_message = 'Course Content Deleted Successfully'
+    success_message ='Course Content Deleted Successfully'
     success_url = reverse_lazy('view_course_content_trash')
-
     def get(self, request, *args, **kwargs):
         id = kwargs['pk']
         self.model.objects.filter(id=id).delete()
-        messages.error(request, self.success_message)
+        messages.error(request,self.success_message)
         return redirect('view_course_content_trash')
 
 
 # Trash
 
 # notifications
-class Add_notification(SuccessMessageMixin, LogoutIfNotStaffMixin, View):
-    def get(self, request, *args, **kwargs):
+class Add_notification(SuccessMessageMixin,LogoutIfNotStaffMixin,View):
+    def get(self,request,*args, **kwargs):
         list = Batch_Db.objects.all().order_by('-id')
         form = Notification__Form()
-        return render(request, 'admin/notification-add.html', locals())
-
-    def post(self, request, *args, **kwargs):
+        return render(request, 'admin/notification-add.html',locals())
+    def post(self,request,*args, **kwargs):
         list = Batch_Db.objects.all()
         batch_id = request.POST.getlist('batch')
-        form = Notification__Form(request.POST, request.FILES)
+        form = Notification__Form(request.POST,request.FILES)
         if form.is_valid():
             form.save()
-            notification_id = Notification_Db.objects.latest('id')
-            # print(notification_id.id)
-            if len(batch_id) != 0:
-                image = form.cleaned_data.get('image')
-                print(image)
-                # id = form.cleaned_data.get('id')
-                details = form.cleaned_data.get('details')
-                print(details)
-                print('------------------------')
-                if image or details:
-                    messages.success(request, 'Notification Successfully Sent')
-                    for i in batch_id:
-                        list = Batch_Db.objects.filter(id=i)
-                        for x in list:
-                            if x.type == True:
-                                for b in User.objects.all():
-                                    form_1 = Notification_Student_Form(request.POST, request.FILES)
-                                    form_11 = form_1.save(commit=False)
-                                    form_11.student_id = b.id
-                                    form_11.notification_id = notification_id.id
-                                    form_11.save()
-                                    devices = FCMDevice.objects.filter(user_id=b.id)
-                                    aa = {'data': form.data, 'notification_code': 1}
-                                    devices.send_message(title="Gaurav Model School", body="NeW Message",
-                                                         data={"test": aa})
-                            else:
-                                for b in x.students.all():
-                                    form_1 = Notification_Student_Form(request.POST, request.FILES)
-                                    form_11 = form_1.save(commit=False)
-                                    form_11.student_id = b.id
-                                    form_11.notification_id = notification_id.id
-                                    form_11.save()
-                                    devices = FCMDevice.objects.filter(user_id=b.id)
-                                    aa = {'data': form.data, 'notification_code': 1}
-                                    devices.send_message(title="Gaurav Model School", body="NeW Message",
-                                                         data={"test": aa})
-                                for b in x.teachers.all():
-                                    form_1 = Notification_Student_Form(request.POST, request.FILES)
-                                    form_11 = form_1.save(commit=False)
-                                    form_11.student_id = b.id
-                                    form_11.notification_id = notification_id.id
-                                    form_11.save()
-                                    devices = FCMDevice.objects.filter(user_id=b.id)
-                                    aa = {'data': form.data, 'notification_code': 1}
-                                    devices.send_message(title="Gaurav Model School", body="NeW Message",
-                                                         data={"test": aa})
-
-                    return redirect('view_notification')
-                    # list = Batch_Db.objects.all().order_by('-id')
-                else:
-                    messages.success(request, 'Please select image or text field')
-            else:
-                messages.success(request, 'Please select atleast one "Batch" ')
-        # else:
-        #
-        #     messages.success(request,'Something  went wrong')
-        return render(request, 'admin/notification-add.html', locals())
-
-
-class Notification_List(LogoutIfNotStaffMixin, TemplateView):
-    template_name = 'admin/notification-list.html'
-
-    # #paginate_by = 100  # if pagination is desired
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['list'] = Notification_Db.objects.all().order_by('-id')
-        return context
-
-
-class Delete_Notification(SuccessMessageMixin, LogoutIfNotStaffMixin, View):
-    model = Notification_Db
-    success_message = 'Notification Deleted Successfully'
-
-    def get(self, request, *args, **kwargs):
-        id = kwargs['pk']
-        self.model.objects.filter(id=id).delete()
-        messages.error(request, self.success_message)
-        return redirect('view_notification')
-
-
-# live ----------------------------
-class Add_Live(SuccessMessageMixin, LogoutIfNotStaffMixin, View):
-    def get(self, request, *args, **kwargs):
-        list = Batch_Db.objects.all().order_by('-id')
-        form = Live__Form()
-        return render(request, 'admin/live-add.html', locals())
-
-    def post(self, request, *args, **kwargs):
-        list = Batch_Db.objects.all()
-        batch_id = request.POST.getlist('batch')
-        form = Live__Form(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            notification_id = Live_Db.objects.latest('id')
+            notification_id= Notification_Db.objects.latest('id')
             # print(notification_id.id)
             if len(batch_id) != 0:
                 image = form.cleaned_data.get('image')
@@ -1538,56 +1383,95 @@ class Add_Live(SuccessMessageMixin, LogoutIfNotStaffMixin, View):
                 print(details)
                 print('------------------------')
                 if image or details:
-                    messages.success(request, 'Live Successfully Sent')
+                    messages.success(request,'Notification Successfully Sent')
                     for i in batch_id:
-                        list = Batch_Db.objects.filter(id=i)
+                        list =  Batch_Db.objects.filter(id=i)
                         for x in list:
-                            if x.type == True:
-                                for b in User.objects.all():
-                                    form_1 = Live_Student_Form(request.POST, request.FILES)
-                                    form_11 = form_1.save(commit=False)
-                                    form_11.student_id = b.id
-                                    form_11.notification_id = notification_id.id
-                                    form_11.save()
-                                    devices = FCMDevice.objects.filter(user_id=b.id)
-                                    aa = {'data': form.data, 'notification_code': 1}
-                                    devices.send_message(title="Gaurav Model School", body="NeW Message",
-                                                         data={"test": aa})
-                            else:
-                                for b in x.students.all():
-                                    form_1 = Live_Student_Form(request.POST, request.FILES)
-                                    form_11 = form_1.save(commit=False)
-                                    form_11.student_id = b.id
-                                    form_11.notification_id = notification_id.id
-                                    form_11.save()
-                                    devices = FCMDevice.objects.filter(user_id=b.id)
-                                    aa = {'data': form.data, 'notification_code': 1}
-                                    devices.send_message(title="Gaurav Model School", body="NeW Message",
-                                                         data={"test": aa})
-                                for b in x.teachers.all():
-                                    form_1 = Live_Student_Form(request.POST, request.FILES)
-                                    form_11 = form_1.save(commit=False)
-                                    form_11.student_id = b.id
-                                    form_11.notification_id = notification_id.id
-                                    form_11.save()
-                                    devices = FCMDevice.objects.filter(user_id=b.id)
-                                    aa = {'data': form.data, 'notification_code': 1}
-                                    devices.send_message(title="Gaurav Model School", body="NeW Message",
-                                                         data={"test": aa})
+                            for b in x.students.all():
+                                form_1 = Notification_Student_Form(request.POST, request.FILES)
+                                form_11 =form_1.save(commit=False)
+                                form_11.student_id=b.id
+                                form_11.notification_id=notification_id.id
+                                form_11.save()
 
-                                # for x in list:
-                                #     for b in x.students.all():
-                                #         form_1 = Live_Student_Form(request.POST, request.FILES)
-                                #         form_11 =form_1.save(commit=False)
-                                #         form_11.student_id=b.id
-                                #         form_11.notification_id=notification_id.id
-                                #         form_11.save()
 
                                 # Student_Notification_Db.objects.create(notification_id=notification_id.id,student_id=b.id)
 
                                 devices = FCMDevice.objects.filter(user_id=b.id)
-                                aa = {'data': form.data, 'notification_code': 1}
-                                devices.send_message(title="Gaurav Model School", body="NeW Message", data={"test": aa})
+                                aa ={'data':form.data,'notification_code':1}
+                                devices.send_message(title="TECOnline",body="NeW Message",data={"test":aa})
+                    return redirect('view_notification')
+                    # list = Batch_Db.objects.all().order_by('-id')
+                else:
+                    messages.success(request, 'Please select image or text field')
+            else:
+                messages.success(request, 'Please select atleast one "Batch" ')
+        # else:
+        #
+        #     messages.success(request,'Something  went wrong')
+        return render(request, 'admin/notification-add.html',locals())
+
+
+
+class Notification_List(LogoutIfNotStaffMixin,TemplateView):
+    template_name = 'admin/notification-list.html'
+    # #paginate_by = 100  # if pagination is desired
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['list'] = Notification_Db.objects.all().order_by('-id')
+        return context
+
+
+class Delete_Notification(SuccessMessageMixin,LogoutIfNotStaffMixin,View):
+    model = Notification_Db
+    success_message ='Notification Deleted Successfully'
+    def get(self, request, *args, **kwargs):
+        id = kwargs['pk']
+        self.model.objects.filter(id=id).delete()
+        messages.error(request,self.success_message)
+        return redirect('view_notification')
+
+
+#live ----------------------------
+class Add_Live(SuccessMessageMixin,LogoutIfNotStaffMixin,View):
+    def get(self,request,*args, **kwargs):
+        list = Batch_Db.objects.all().order_by('-id')
+        form = Live__Form()
+        return render(request, 'admin/live-add.html',locals())
+    def post(self,request,*args, **kwargs):
+        list = Batch_Db.objects.all()
+        batch_id = request.POST.getlist('batch')
+        form = Live__Form(request.POST,request.FILES)
+        if form.is_valid():
+            form.save()
+            notification_id= Live_Db.objects.latest('id')
+            # print(notification_id.id)
+            if len(batch_id) != 0:
+                image = form.cleaned_data.get('image')
+                print(image)
+                # id = form.cleaned_data.get('id')
+                # print(id)
+                details = form.cleaned_data.get('details')
+                print(details)
+                print('------------------------')
+                if image or details:
+                    messages.success(request,'Live Successfully Sent')
+                    for i in batch_id:
+                        list =  Batch_Db.objects.filter(id=i)
+                        for x in list:
+                            for b in x.students.all():
+                                form_1 = Live_Student_Form(request.POST, request.FILES)
+                                form_11 =form_1.save(commit=False)
+                                form_11.student_id=b.id
+                                form_11.notification_id=notification_id.id
+                                form_11.save()
+
+
+                                # Student_Notification_Db.objects.create(notification_id=notification_id.id,student_id=b.id)
+
+                                devices = FCMDevice.objects.filter(user_id=b.id)
+                                aa ={'data':form.data,'notification_code':1}
+                                devices.send_message(title="TECOnline",body="NeW Message",data={"test":aa})
                     return redirect('view_live')
                     # list = Batch_Db.objects.all().order_by('-id')
                 else:
@@ -1597,12 +1481,12 @@ class Add_Live(SuccessMessageMixin, LogoutIfNotStaffMixin, View):
         # else:
         #
         #     messages.success(request,'Something  went wrong')
-        return render(request, 'admin/live-add.html', locals())
+        return render(request, 'admin/live-add.html',locals())
 
 
-class Live_List(LogoutIfNotStaffMixin, TemplateView):
+
+class Live_List(LogoutIfNotStaffMixin,TemplateView):
     template_name = 'admin/live-list.html'
-
     # #paginate_by = 100  # if pagination is desired
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -1610,37 +1494,35 @@ class Live_List(LogoutIfNotStaffMixin, TemplateView):
         return context
 
 
-class Delete_Live(SuccessMessageMixin, LogoutIfNotStaffMixin, View):
+class Delete_Live(SuccessMessageMixin,LogoutIfNotStaffMixin,View):
     model = Live_Db
-    success_message = 'Live Deleted Successfully'
-
+    success_message ='Live Deleted Successfully'
     def get(self, request, *args, **kwargs):
         id = kwargs['pk']
         self.model.objects.filter(id=id).delete()
         Live_Notification_Db.objects.filter(notification_id=id).delete()
-        messages.error(request, self.success_message)
+        messages.error(request,self.success_message)
         return redirect('view_live')
 
 
 def edit_notification(request):
     return render(request, 'admin/notification-edit.html')
-
-
 # notifications
 
-# Plans
-class Add_Plan(SuccessMessageMixin, LogoutIfNotStaffMixin, CreateView):
+#Plans
+class Add_Plan(SuccessMessageMixin,LogoutIfNotStaffMixin,CreateView):
     model = Plan_Db
     form_class = Plan_Form
     success_url = reverse_lazy('plan_list')
-    success_message = ' Plan Added Successfully'
+    success_message =' Plan Added Successfully'
     template_name = 'admin/add-plan.html'
 
 
-class Plan_List(LogoutIfNotStaffMixin, TemplateView):
+
+
+class Plan_List(LogoutIfNotStaffMixin,TemplateView):
     model = Plan_Db
     template_name = 'admin/plan-list.html'
-
     # #paginate_by = 100  # if pagination is desired
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -1648,23 +1530,24 @@ class Plan_List(LogoutIfNotStaffMixin, TemplateView):
         return context
 
 
-class Edit_Plans(SuccessMessageMixin, LogoutIfNotStaffMixin, UpdateView):
+
+class Edit_Plans(SuccessMessageMixin,LogoutIfNotStaffMixin,UpdateView):
     model = Plan_Db
     form_class = Plan_Form
     template_name = 'admin/edit-plan.html'
-    success_message = 'Plan Updated Successfully'
+    success_message ='Plan Updated Successfully'
     success_url = reverse_lazy('plan_list')
 
 
-class Delete_Plan(SuccessMessageMixin, LogoutIfNotStaffMixin, View):
-    model = Plan_Db
-    success_message = 'Plan Deleted Successfully'
-    success_url = reverse_lazy('view_blog_trash')
 
+class Delete_Plan(SuccessMessageMixin,LogoutIfNotStaffMixin,View):
+    model = Plan_Db
+    success_message ='Plan Deleted Successfully'
+    success_url = reverse_lazy('view_blog_trash')
     def get(self, request, *args, **kwargs):
         id = kwargs['pk']
         self.model.objects.filter(id=id).delete()
-        messages.error(request, self.success_message)
+        messages.error(request,self.success_message)
         return redirect('plan_list')
 
 
@@ -1677,19 +1560,10 @@ def serve_protected_document(request, file):
     # Split the elements of the path
     path, file_name = os.path.split(file)
 
-    response = FileResponse(document.file, )
+    response = FileResponse(document.file,)
     response["Content-Disposition"] = "attachment; filename=" + file_name
 
     return response
 
 
-#
 
-def get_main_course_id(request, id):
-    request.session['main_id'] = id
-    print(id)
-    batch_kliye.objects.filter(id=1).update(name=id)
-
-    form = student_form()
-
-    return render(request, "admin/new.html", locals())
